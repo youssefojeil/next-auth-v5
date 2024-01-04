@@ -6,6 +6,8 @@ import * as z from 'zod';
 import { db } from '@/lib/db';
 import { getUserByEmail } from '@/data/user';
 import { RegisterSchema } from '@/schemas';
+import { generateVerificationToken } from '@/lib/tokens';
+import { sendVerificationEmail } from '@/lib/mail';
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
   console.log(values);
@@ -38,9 +40,11 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
     },
   });
 
-  // TODO: send verification token email
+  const verificationToken = await generateVerificationToken(email);
+
+  await sendVerificationEmail(verificationToken.email, verificationToken.token);
 
   return {
-    success: 'Account Created!',
+    success: 'Confirmation email sent!',
   };
 };
