@@ -7,6 +7,7 @@ import { LoginSchema } from '@/schemas';
 import { generateVerificationToken } from '@/lib/tokens';
 import * as z from 'zod';
 import { getUserByEmail } from '@/data/user';
+import { sendVerificationEmail } from '@/lib/mail';
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
   console.log(values);
@@ -33,6 +34,8 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     const verifcationToken = await generateVerificationToken(
       existingUser.email
     );
+
+    await sendVerificationEmail(verifcationToken.email, verifcationToken.token);
 
     return {
       success: 'Confirmation Email Sent!',
